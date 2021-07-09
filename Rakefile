@@ -3,16 +3,16 @@ require 'rspec/core/rake_task'
 require 'fileutils'
 
 DISTRIBUTIONS = [
-  { rb_platform: 'i386-darwin',   filename: 'darwin-386' },
-  { rb_platform: 'x86_64-darwin', filename: 'darwin-amd64' },
-  { rb_platform: 'i386-linux',    filename: 'linux-386' },
-  { rb_platform: 'x86_64-linux',  filename: 'linux-amd64' },
-  { rb_platform: 'arm-linux',     filename: 'linux-arm' },
-  { rb_platform: 'arm64-linux',   filename: 'linux-arm64' },
-  { rb_platform: 'ppc64le-linux', filename: 'linux-ppc64le' },
-  { rb_platform: 's390x-linux',   filename: 'linux-s390x' },
-  { rb_platform: 'i386-mswin64',  filename: 'windows-386' },
-  { rb_platform: 'x64-mswin64',   filename: 'windows-amd64' }
+  { rb_platform: 'x86_64-darwin', tuple: %w(darwin amd64) },
+  { rb_platform: 'arm64-darwin',  tuple: %w(darwin arm64) },
+  { rb_platform: 'x86-linux',     tuple: %w(linux 386) },
+  { rb_platform: 'x86_64-linux',  tuple: %w(linux amd64) },
+  { rb_platform: 'arm-linux',     tuple: %w(linux arm) },
+  { rb_platform: 'arm64-linux',   tuple: %w(linux arm64) },
+  { rb_platform: 'ppc64le-linux', tuple: %w(linux ppc64le) },
+  { rb_platform: 's390x-linux',   tuple: %w(linux s390x) },
+  { rb_platform: 'x86-mswin64',  tuple: %w(windows 386), ext: '.exe' },
+  { rb_platform: 'x64-mswin64',   tuple: %w(windows amd64), ext: '.exe' }
 ]
 
 task :build do
@@ -26,19 +26,10 @@ task :build do
     FileUtils.rm_rf('vendor')
     FileUtils.mkdir('vendor')
 
-    url = "https://dl.k8s.io/v#{KubectlRb::KUBECTL_VERSION}/kubernetes-client-#{distro[:filename]}.tar.gz"
-    archive = 'kubectl.tar.gz'
-    File.write(archive, open(url).read)
-    FileUtils.mkdir('kubectl')
-    system("tar -C kubectl -xzvf #{archive}")
-    FileUtils.rm(archive)
-
-    Dir.glob(File.join(*%w(kubectl kubernetes client bin), 'kubectl*')).each do |exe|
-      system("chmod +x #{exe}")
-      FileUtils.cp(exe, 'vendor')
-    end
-
-    FileUtils.rm_rf('kubectl')
+    tuple = distro[:tuple].join('/')
+    exe = "kubectl#{distro[:ext]}"
+    url = "https://dl.k8s.io/release/v#{KubectlRb::KUBECTL_VERSION}/bin/#{tuple}/#{exe}"
+    File.write(File.join('vendor', exe), URI.open(url).read)
 
     gemspec = eval(File.read('kubectl-rb.gemspec'))
     gemspec.platform = distro[:rb_platform]
@@ -52,9 +43,7 @@ task :publish do
 
   Dir.glob(File.join('pkg', "kubectl-rb-#{KubectlRb::VERSION}-*.gem")).each do |pkg|
     puts "Publishing #{pkg}"
-    STDOUT.write("Enter OTP code: ")
-    otp = STDIN.gets.strip
-    system("gem push -k rubygems --otp #{otp} #{pkg}")
+    system("gem push -k rubygems #{pkg}")
   end
 end
 
