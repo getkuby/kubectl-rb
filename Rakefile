@@ -9,9 +9,10 @@ DISTRIBUTIONS = [
   { rb_platform: 'x86_64-linux',  tuple: %w(linux amd64) },
   { rb_platform: 'arm-linux',     tuple: %w(linux arm) },
   { rb_platform: 'arm64-linux',   tuple: %w(linux arm64) },
+  { rb_platform: 'aarch64-linux', tuple: %w(linux arm64) },
   { rb_platform: 'ppc64le-linux', tuple: %w(linux ppc64le) },
   { rb_platform: 's390x-linux',   tuple: %w(linux s390x) },
-  { rb_platform: 'x86-mswin64',  tuple: %w(windows 386), ext: '.exe' },
+  { rb_platform: 'x86-mswin64',   tuple: %w(windows 386), ext: '.exe' },
   { rb_platform: 'x64-mswin64',   tuple: %w(windows amd64), ext: '.exe' }
 ]
 
