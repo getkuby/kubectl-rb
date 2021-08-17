@@ -9,7 +9,8 @@ Gem::Specification.new do |s|
   s.homepage = 'http://github.com/getkuby/kubectl-rb'
   s.license  = 'Apache-2.0'
 
-  s.description = s.summary = 'Kubectl distributed as a Rubygem.'
+  s.summary = 'Kubectl distributed as a Rubygem.'
+  s.description = 'The kubectl binary executable packaged and distributed as a Rubygem.'
 
   s.platform = Gem::Platform::RUBY
 

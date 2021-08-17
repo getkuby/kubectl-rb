@@ -30,7 +30,11 @@ task :build do
     tuple = distro[:tuple].join('/')
     exe = "kubectl#{distro[:ext]}"
     url = "https://dl.k8s.io/release/v#{KubectlRb::KUBECTL_VERSION}/bin/#{tuple}/#{exe}"
-    File.write(File.join('vendor', exe), URI.open(url).read)
+    vendored_exe = File.join('vendor', exe)
+    File.write(vendored_exe, URI.open(url).read)
+
+    # user rwx, group rx, world rx
+    File.chmod(0755, vendored_exe)
 
     gemspec = eval(File.read('kubectl-rb.gemspec'))
     gemspec.platform = distro[:rb_platform]
